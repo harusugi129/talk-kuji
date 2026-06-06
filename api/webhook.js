@@ -9,8 +9,14 @@ const getRawBody = require('raw-body');
 // → グループで「マイID」と送ると確認できます（セットアップ時に使用）
 const MY_USER_ID = process.env.MY_USER_ID || '';
 
-// アタリメンバー（自分に出るメンバー）
-const ATARI_MEMBER = '遠藤さくら';
+// アタリメンバー（自分に出るメンバー）※複数指定するとランダムで選ばれる
+const ATARI_MEMBERS = [
+  '遠藤さくら',
+  '賀喜遥香',
+  '筒井あやめ',
+  '池田瑛紗',
+  '井上和',
+];
 
 // ハズレメンバーリスト（他の人に出るメンバー）
 const HAZURE_MEMBERS = [
@@ -82,7 +88,7 @@ async function handleEvent(event) {
   if (TRIGGER_WORDS.includes(text)) {
     const isAtari = MY_USER_ID !== '' && userId === MY_USER_ID;
     const member = isAtari
-      ? ATARI_MEMBER
+      ? ATARI_MEMBERS[Math.floor(Math.random() * ATARI_MEMBERS.length)]
       : HAZURE_MEMBERS[Math.floor(Math.random() * HAZURE_MEMBERS.length)];
 
     return client.replyMessage({
