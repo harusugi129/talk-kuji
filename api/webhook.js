@@ -1,6 +1,10 @@
 const { messagingApi, validateSignature } = require('@line/bot-sdk');
 const getRawBody = require('raw-body');
 
+module.exports.config = {
+  api: { bodyParser: false },
+};
+
 // ====================================================
 // ★ 設定エリア - ここだけ編集してください
 // ====================================================
