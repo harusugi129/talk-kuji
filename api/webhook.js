@@ -101,58 +101,37 @@ async function handleEvent(event) {
 function buildFlexMessage(isAtari, memberName) {
   return {
     type: 'flex',
-    altText: isAtari
-      ? `🎉 アタリ！ ${memberName} のトーク権獲得！`
-      : `😢 ハズレ... ${memberName} でした`,
+    altText: `結果：${memberName}`,
     contents: {
       type: 'bubble',
       size: 'mega',
-      header: {
+      body: {
         type: 'box',
         layout: 'vertical',
-        paddingAll: '12px',
-        backgroundColor: isAtari ? '#3d0066' : '#1a1a2e',
+        spacing: 'sm',
+        paddingAll: '24px',
+        backgroundColor: '#1a0533',
         contents: [
           {
             type: 'text',
-            text: '🎫 乃木坂46 トーク権くじ',
+            text: '乃木坂46 トーク権くじ',
             color: '#c9a0d8',
             size: 'sm',
             align: 'center',
           },
-        ],
-      },
-      body: {
-        type: 'box',
-        layout: 'vertical',
-        spacing: 'md',
-        paddingAll: '24px',
-        backgroundColor: isAtari ? '#1a0533' : '#0d0d1a',
-        contents: [
           {
-            type: 'text',
-            text: isAtari ? '🎉 アタリ！' : '😢 ハズレ...',
-            weight: 'bold',
-            size: 'xxl',
-            color: isAtari ? '#ffd700' : '#666666',
-            align: 'center',
+            type: 'separator',
+            margin: 'md',
+            color: '#3d0066',
           },
           {
             type: 'text',
             text: memberName,
             weight: 'bold',
             size: 'xxl',
-            color: isAtari ? '#f9c0d0' : '#888888',
+            color: '#f9c0d0',
             align: 'center',
-            margin: 'md',
-          },
-          {
-            type: 'text',
-            text: isAtari ? 'トーク権 獲得！🌸' : 'また今度！',
-            size: 'sm',
-            color: isAtari ? '#d4a0e0' : '#555555',
-            align: 'center',
-            margin: 'sm',
+            margin: 'lg',
           },
         ],
       },
