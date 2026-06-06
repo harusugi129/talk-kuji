@@ -1,0 +1,9 @@
+{
+  "name": "inkichi-line-kuji",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@line/bot-sdk": "^8.7.0",
+    "raw-body": "^2.5.2"
+  }
+}

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>乃木坂46 トーク権くじ</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+      background: linear-gradient(135deg, #1a0533 0%, #3d0066 50%, #1a0533 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #f9c0d0;
+      letter-spacing: 2px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #c9a0d8;
+      margin-bottom: 30px;
+    }
+
+    /* くじ券エリア */
+    .ticket-area {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(249,192,208,0.3);
+      border-radius: 20px;
+      padding: 30px 20px;
+      margin-bottom: 24px;
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ticket-area::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(249,192,208,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* 初期状態 */
+    .initial-icon {
+      font-size: 64px;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 0 16px rgba(249,192,208,0.5));
+    }
+
+    .initial-text {
+      font-size: 16px;
+      color: #d4a0e0;
+    }
+
+    /* スロットアニメーション */
+    .slot-wrapper {
+      width: 100%;
+      height: 160px;
+      overflow: hidden;
+      position: relative;
+      display: none;
+    }
+
+    .slot-track {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.05s linear;
+    }
+
+    .slot-item {
+      height: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 100%;
+    }
+
+    .slot-item .member-icon {
+      font-size: 56px;
+      margin-bottom: 6px;
+    }
+
+    .slot-item .member-name-slot {
+      font-size: 18px;
+      font-weight: bold;
+      color: #f9c0d0;
+    }
+
+    /* 結果表示 */
+    .result-area {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeInScale 0.5s ease forwards;
+    }
+
+    @keyframes fadeInScale {
+      from { opacity: 0; transform: scale(0.8); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .result-badge {
+      font-size: 13px;
+      font-weight: bold;
+      padding: 4px 16px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+      letter-spacing: 1px;
+    }
+
+    .result-badge.atari {
+      background: linear-gradient(90deg, #ff6b9d, #ffd700);
+      color: #fff;
+      box-shadow: 0 0 20px rgba(255,215,0,0.5);
+    }
+
+    .result-badge.hazure {
+      background: rgba(255,255,255,0.15);
+      color: #c0c0c0;
+    }
+
+    .result-icon {
+      font-size: 72px;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 0 20px rgba(249,192,208,0.6));
+    }
+
+    .result-icon.atari {
+      animation: pulse 1s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(255,215,0,0.7)); }
+      50%       { transform: scale(1.08); filter: drop-shadow(0 0 30px rgba(255,215,0,1)); }
+    }
+
+    .result-name {
+      font-size: 28px;
+      font-weight: bold;
+      color: #f9c0d0;
+      margin-bottom: 4px;
+      letter-spacing: 2px;
+    }
+
+    .result-name.atari {
+      color: #ffd700;
+      text-shadow: 0 0 10px rgba(255,215,0,0.5);
+    }
+
+    .result-sub {
+      font-size: 13px;
+      color: #c9a0d8;
+    }
+
+    /* キラキラエフェクト */
+    .sparkles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: none;
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #ffd700;
+      border-radius: 50%;
+      animation: sparkle-anim 1.2s ease forwards;
+    }
+
+    @keyframes sparkle-anim {
+      0%   { opacity: 1; transform: scale(1) translate(0,0); }
+      100% { opacity: 0; transform: scale(0) translate(var(--tx), var(--ty)); }
+    }
+
+    /* ボタン */
+    .btn {
+      width: 100%;
+      padding: 18px;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      letter-spacing: 2px;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-draw {
+      background: linear-gradient(135deg, #e91e8c, #9c27b0);
+      color: #fff;
+      box-shadow: 0 6px 24px rgba(233,30,140,0.5);
+    }
+
+    .btn-draw:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(233,30,140,0.6);
+    }
+
+    .btn-draw:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn-draw:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-reset {
+      background: rgba(255,255,255,0.1);
+      color: #d4a0e0;
+      border: 1px solid rgba(249,192,208,0.3);
+      margin-top: 12px;
+      font-size: 14px;
+      padding: 12px;
+    }
+
+    .btn-reset:hover {
+      background: rgba(255,255,255,0.15);
+    }
+
+    .btn-reset.hidden { display: none; }
+
+    /* フッター */
+    .footer {
+      margin-top: 20px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.25);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="title">🎫 乃木坂46</div>
+  <div class="subtitle">トーク権 罰ゲームくじ</div>
+
+  <div class="ticket-area" id="ticketArea">
+    <!-- キラキラ -->
+    <div class="sparkles" id="sparkles"></div>
+
+    <!-- 初期 -->
+    <div id="initialView">
+      <div class="initial-icon">🎟️</div>
+      <div class="initial-text">ボタンを押してくじを引こう！</div>
+    </div>
+
+    <!-- スロット -->
+    <div class="slot-wrapper" id="slotWrapper">
+      <div class="slot-track" id="slotTrack"></div>
+    </div>
+
+    <!-- 結果 -->
+    <div class="result-area" id="resultArea">
+      <div class="result-badge" id="resultBadge"></div>
+      <div class="result-icon" id="resultIcon"></div>
+      <div class="result-name" id="resultName"></div>
+      <div class="result-sub" id="resultSub"></div>
+    </div>
+  </div>
+
+  <button class="btn btn-draw" id="btnDraw" onclick="drawLot()">🎯 くじを引く！</button>
+  <button class="btn btn-reset hidden" id="btnReset" onclick="reset()">もう一度</button>
+
+  <div class="footer">※ このくじは非公式のファン向けコンテンツです</div>
+</div>
+
+<script>
+  // ====================================================
+  // ★★★ ここを自分用に編集してください ★★★
+  // ====================================================
+
+  // 【自分用アタリメンバー】狙ったメンバーをここに設定
+  const ATARI_MEMBER = {
+    name: "遠藤さくら",   // メンバー名
+    icon: "🌸",            // 絵文字アイコン
+    sub: "トーク権 獲得！🎉"
+  };
+
+  // 【シークレットキー】これをURLに ?s=○○ と付けると必ずアタリになる
+  // 例: https://あなたのサイト/?s=sakura2025
+  const SECRET_KEY = "sakura2025";  // ← 好きな文字に変える
+
+  // 【ハズレメンバー】他の人に出るメンバーのリスト（増減OK）
+  const HAZURE_MEMBERS = [
+    { name: "井上和",     icon: "🌼", sub: "ハズレ...また今度！" },
+    { name: "五百城茉央", icon: "🌙", sub: "ハズレ...また今度！" },
+    { name: "小川彩",     icon: "🌷", sub: "ハズレ...また今度！" },
+    { name: "奥田いろは", icon: "⭐", sub: "ハズレ...また今度！" },
+    { name: "池田瑛紗",   icon: "🎨", sub: "ハズレ...また今度！" },
+    { name: "田村真佑",   icon: "🌺", sub: "ハズレ...また今度！" },
+    { name: "弓木奈於",   icon: "🎀", sub: "ハズレ...また今度！" },
+  ];
+
+  // ====================================================
+  // ここから下は編集不要
+  // ====================================================
+
+  // URLパラメータでシークレットキーを確認
+  const params = new URLSearchParams(location.search);
+  const isRigged = params.get('s') === SECRET_KEY;
+
+  function drawLot() {
+    document.getElementById('btnDraw').disabled = true;
+    document.getElementById('initialView').style.display = 'none';
+
+    // スロットアニメーション開始
+    const wrapper = document.getElementById('slotWrapper');
+    const track = document.getElementById('slotTrack');
+    wrapper.style.display = 'block';
+
+    // スロット用にメンバーをシャッフルして並べる
+    const pool = [...HAZURE_MEMBERS, ATARI_MEMBER, ...HAZURE_MEMBERS, ATARI_MEMBER];
+    const shuffled = pool.sort(() => Math.random() - 0.5);
+    // 最後に正解を追加（アタリ/ハズレ問わず最終表示用）
+    const finalMember = isRigged
+      ? ATARI_MEMBER
+      : HAZURE_MEMBERS[Math.floor(Math.random() * HAZURE_MEMBERS.length)];
+
+    // スロットアイテムを生成
+    track.innerHTML = '';
+    [...shuffled, finalMember].forEach(m => {
+      const el = document.createElement('div');
+      el.className = 'slot-item';
+      el.innerHTML = `<div class="member-icon">${m.icon}</div><div class="member-name-slot">${m.name}</div>`;
+      track.appendChild(el);
+    });
+
+    // スロット回転アニメーション
+    const itemHeight = 160;
+    const totalItems = track.children.length;
+    const finalIndex = totalItems - 1;
+
+    let speed = 16;      // 初期スピード（px/frame）
+    let position = 0;
+    let frameCount = 0;
+    const totalFrames = 80; // アニメーション総フレーム数
+
+    function animate() {
+      frameCount++;
+      const progress = frameCount / totalFrames;
+
+      // イーズアウト：後半ゆっくりになる
+      if (progress > 0.6) {
+        speed = Math.max(2, speed * 0.92);
+      }
+
+      position += speed;
+
+      // 最終位置
+      const maxPos = finalIndex * itemHeight;
+      if (position >= maxPos || frameCount >= totalFrames + 30) {
+        track.style.transform = `translateY(-${maxPos}px)`;
+        showResult(finalMember);
+        return;
+      }
+
+      track.style.transform = `translateY(-${position}px)`;
+      requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  function showResult(member) {
+    const isAtari = member.name === ATARI_MEMBER.name;
+
+    // スロット非表示
+    document.getElementById('slotWrapper').style.display = 'none';
+
+    // 結果表示
+    const resultArea = document.getElementById('resultArea');
+    const badge = document.getElementById('resultBadge');
+    const icon = document.getElementById('resultIcon');
+    const name = document.getElementById('resultName');
+    const sub = document.getElementById('resultSub');
+
+    badge.textContent = isAtari ? '🎉 アタリ！' : 'ハズレ...';
+    badge.className = 'result-badge ' + (isAtari ? 'atari' : 'hazure');
+    icon.textContent = member.icon;
+    icon.className = 'result-icon ' + (isAtari ? 'atari' : '');
+    name.textContent = member.name;
+    name.className = 'result-name ' + (isAtari ? 'atari' : '');
+    sub.textContent = member.sub;
+
+    resultArea.style.display = 'flex';
+
+    // アタリならキラキラ
+    if (isAtari) spawnSparkles();
+
+    document.getElementById('btnReset').classList.remove('hidden');
+  }
+
+  function spawnSparkles() {
+    const container = document.getElementById('sparkles');
+    container.style.display = 'block';
+    container.innerHTML = '';
+    for (let i = 0; i < 20; i++) {
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      const x = Math.random() * 100;
+      const y = Math.random() * 100;
+      const tx = (Math.random() - 0.5) * 120 + 'px';
+      const ty = (Math.random() - 0.5) * 120 + 'px';
+      s.style.cssText = `left:${x}%;top:${y}%;--tx:${tx};--ty:${ty};animation-delay:${Math.random()*0.4}s`;
+      container.appendChild(s);
+    }
+  }
+
+  function reset() {
+    document.getElementById('initialView').style.display = 'block';
+    document.getElementById('resultArea').style.display = 'none';
+    document.getElementById('sparkles').style.display = 'none';
+    document.getElementById('btnDraw').disabled = false;
+    document.getElementById('btnReset').classList.add('hidden');
+    document.getElementById('slotTrack').innerHTML = '';
+  }
+</script>
+
+</body>
+</html>
