@@ -35,8 +35,6 @@ const HAZURE_MEMBERS = [
   '伊藤理々杏',
   '黒見明香',
   '長嶋凛桜',
-  '岡本姫奈',
-  '冨里奈央',
   '矢田萌華',
 ];
 
@@ -96,7 +94,7 @@ async function handleEvent(event) {
   const replyToken = event.replyToken;
 
   // トリガーワード → 八百長モード発動（返信なし・バレ防止）
-  if (text === TRIGGER_WORD) {
+  if (text.includes(TRIGGER_WORD)) {
     await redis.set(REDIS_KEY, RIGGED_COUNT, { ex: 1800 });
     return;
   }
